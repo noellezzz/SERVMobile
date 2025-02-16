@@ -69,11 +69,9 @@ const Questions = () => {
 
       if (!response.ok) throw new Error('Failed to fetch MP3')
 
-      // Convert response to base64
       const fileData = await response.arrayBuffer()
       const base64 = encode(fileData)
 
-      // Save to Expo's cache directory
       const sanitizeFilename = text => {
         return text.replace(/[^a-zA-Z0-9]/g, '_')
       }
@@ -85,7 +83,6 @@ const Questions = () => {
 
       setStatus(`Audio saved at: ${path}`)
       return path
-      // playAudio(path)
     } catch (error) {
       setStatus('Error: ' + error.message)
     }
@@ -104,13 +101,13 @@ const Questions = () => {
         if (question.audioEnglish) {
           console.log(`Playing English: ${question.audioEnglish}`)
           await playAudio(question.audioEnglish)
-          await new Promise(resolve => setTimeout(resolve, 500)) // 500ms delay
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
 
         if (question.audioTagalog) {
           console.log(`Playing Tagalog: ${question.audioTagalog}`)
           await playAudio(question.audioTagalog)
-          await new Promise(resolve => setTimeout(resolve, 500)) // 500ms delay
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
       }
     } catch (error) {
@@ -126,7 +123,7 @@ const Questions = () => {
       await new Promise(resolve => {
         sound.setOnPlaybackStatusUpdate(async status => {
           if (status.didJustFinish) {
-            await sound.unloadAsync() // Unload after playing
+            await sound.unloadAsync()
             resolve()
           }
         })
