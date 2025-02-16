@@ -12,7 +12,6 @@ export const nameSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
 export const { setName } = nameSlice.actions
 
 export default nameSlice.reducer

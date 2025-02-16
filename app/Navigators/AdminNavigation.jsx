@@ -8,6 +8,7 @@ import ReportsScreen from '../Screens/Admin/Reports'
 import SettingsScreen from '../Screens/Admin/Settings'
 import UsersScreen from '../Screens/Admin/Users'
 import VisualizersScreen from '../Screens/Admin/Visualizer'
+import QuestionsScreen from '../Screens/Admin/Questions'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const Drawer = createDrawerNavigator()
@@ -45,6 +46,9 @@ export default function DrawerNavigator() {
             case 'Feedbacks':
               iconName = focused ? 'chatbubbles' : 'chatbubbles-outline'
               break
+            case 'Questions':
+              iconName = focused ? 'chatbubbles' : 'chatbubbles-outline'
+              break
             default:
               iconName = 'help-circle-outline'
           }
@@ -61,6 +65,7 @@ export default function DrawerNavigator() {
       <Drawer.Screen name="Settings" component={SettingsScreen} />
       <Drawer.Screen name="Reports" component={ReportsScreen} />
       <Drawer.Screen name="Feedbacks" component={FeedbacksScreen} />
+      <Drawer.Screen name="Questions" component={QuestionsScreen} />
     </Drawer.Navigator>
   )
 }

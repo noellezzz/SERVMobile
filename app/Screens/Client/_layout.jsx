@@ -8,7 +8,17 @@ import { Ionicons } from '@expo/vector-icons'
 
 export default function Layout() {
   return (
-    <Tabs.Navigator screenOptions={{ headerShown: false }}>
+    <Tabs.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#960303',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          height: 60,
+          paddingBottom: 5,
+        },
+      }}
+    >
       <Tabs.Screen
         name="Home"
         component={HomeScreen}
