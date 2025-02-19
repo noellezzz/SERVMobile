@@ -61,7 +61,7 @@ const Questions = () => {
     setStatus('Generating audio...')
 
     try {
-      const response = await fetch('http://192.168.1.47:5000/generate-audio', {
+      const response = await fetch('http://192.168.1.33:5000/generate-audio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text }),
