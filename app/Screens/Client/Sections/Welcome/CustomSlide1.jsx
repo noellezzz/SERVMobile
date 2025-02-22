@@ -41,12 +41,7 @@ const CustomSlide1 = () => {
             marginHorizontal: 20,
             marginVertical: 30,
           }}
-        >
-          This is a smart web and mobile app that evaluates senior citizens'
-          behavior in service lines. By combining behavioral tests, feedback,
-          and AI analysis, it optimizes queue management, reduces wait times,
-          and enhances satisfaction.
-        </Text>
+        ></Text>
       </View>
     </View>
   )

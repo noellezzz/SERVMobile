@@ -25,11 +25,10 @@ const Welcome = ({ navigation }) => {
   const handleSnapToItem = index => {
     setActiveIndex(index)
 
-    // If the user slides past the last slide, navigate to ClientStack
     if (index === data.length - 1) {
       setTimeout(() => {
-        navigation.replace('ClientStack') // Prevent back navigation
-      }, 500) // Optional delay for smoother transition
+        navigation.replace('ClientStack')
+      }, 500)
     }
   }
 
@@ -45,7 +44,7 @@ const Welcome = ({ navigation }) => {
           return <Component {...item.props} />
         }}
         onProgressChange={progress}
-        onSnapToItem={handleSnapToItem} // Handle slide change
+        onSnapToItem={handleSnapToItem}
       />
 
       <Pagination.Custom

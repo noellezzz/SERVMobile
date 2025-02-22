@@ -37,17 +37,17 @@ const CustomSlide3 = ({ navigation }) => {
               marginRight: 20,
             }}
           >
-            ABOUT
+            LET'S START
           </Text>
-          <Image
+          {/* <Image
             source={WordMark}
             style={{ width: 200, height: 130, resizeMode: 'contain' }}
-          />
+          /> */}
         </View>
-        <Image
+        {/* <Image
           source={Logo}
           style={{ width: '50%', height: 200, resizeMode: 'contain' }}
-        />
+        /> */}
         <Text
           style={{
             color: 'white',
@@ -58,13 +58,13 @@ const CustomSlide3 = ({ navigation }) => {
             marginHorizontal: 20,
           }}
         >
-          SERV is an intelligent web and mobile application designed to enhance
+          {/* SERV is an intelligent web and mobile application designed to enhance
           queue management by analyzing senior citizens' behavior in service
           lines. Using a combination of behavioral tests, real-time feedback,
           and AI-driven insights, SERV streamlines the waiting experience,
-          reduces congestion, and improves service satisfaction.
+          reduces congestion, and improves service satisfaction. */}
         </Text>
-        <View style={{ height: 50, width: '100%', marginVertical: 20 }}>
+        {/* <View style={{ height: 50, width: '100%', marginVertical: 20 }}>
           <ContainerTile>
             <TouchableWithoutFeedback
               onPress={() => navigation.navigate('ClientStack')}
@@ -78,7 +78,7 @@ const CustomSlide3 = ({ navigation }) => {
         <Button
           title="Go to Admin"
           onPress={() => navigation.navigate('AdminDrawer')}
-        />
+        /> */}
       </View>
     </View>
   )
