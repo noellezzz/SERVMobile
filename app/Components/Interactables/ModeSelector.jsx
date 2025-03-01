@@ -17,8 +17,8 @@ const ModeSelector = ({ options, selectedOption, changeMode }) => {
         >
           <Text
             style={{
-              padding: 14,
-              paddingHorizontal: 22,
+              padding: 10,
+              paddingHorizontal: 10,
               borderWidth: 2,
               borderRightWidth: index !== options.length - 1 ? 1 : 2,
               borderTopLeftRadius: index === 0 ? 12 : 0,
@@ -29,6 +29,7 @@ const ModeSelector = ({ options, selectedOption, changeMode }) => {
               borderColor: selectedOption === option ? '#D21414' : 'gray',
               color: selectedOption === option ? '#D21414' : 'gray',
               fontWeight: 500,
+              fontSize: 10,
             }}
           >
             {option}

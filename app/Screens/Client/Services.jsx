@@ -1,7 +1,11 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native'
 import React, { useState } from 'react'
 import CustomButton from '../../Components/Buttons/CustomButton'
 import AccordionItem from '../../Components/Interactables/AccordionItem'
+import Divider from '../../Components/Layouts/Divider'
+import HorizontalCarousel from '../../Components/Layouts/HorizontalCarousel'
+
+const screenWidth = Dimensions.get('window').width - 100
 
 const styles = StyleSheet.create({
   container: {
@@ -65,32 +69,38 @@ const Settings = () => {
   const [activeIndex, setActiveIndex] = useState(null)
   return (
     <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 20, fontWeight: 700 }}>Settings</Text>
-      <Text style={{ fontSize: 12 }}>Here are the services that we offer.</Text>
-      <View
-        style={{
-          borderColor: 'gray',
-          borderBottomWidth: 1,
-          marginTop: 5,
-          marginBottom: 15,
-        }}
-      ></View>
-      <View>
-        {accordionData.map((item, index) => (
-          <View key={item.id} style={styles.accordionItem}>
-            <CustomButton
-              mode="outlined"
-              title={item.title}
-              onPress={() =>
-                setActiveIndex(activeIndex === index ? null : index)
-              }
-            />
-            <AccordionItem isExpanded={activeIndex === index}>
-              {item.content}
-            </AccordionItem>
-          </View>
-        ))}
-      </View>
+      <ScrollView>
+        <Text style={{ fontSize: 20, fontWeight: 700 }}>Services</Text>
+        <Text style={{ fontSize: 12 }}>
+          Here are the services that we offer.
+        </Text>
+        <Divider />
+        <View
+          style={{
+            marginBottom: 10,
+            height: 270,
+            paddingVertical: 5,
+          }}
+        >
+          <HorizontalCarousel />
+        </View>
+        <View>
+          {accordionData.map((item, index) => (
+            <View key={item.id} style={styles.accordionItem}>
+              <CustomButton
+                mode="outlined"
+                title={item.title}
+                onPress={() =>
+                  setActiveIndex(activeIndex === index ? null : index)
+                }
+              />
+              <AccordionItem isExpanded={activeIndex === index}>
+                {item.content}
+              </AccordionItem>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
     </View>
   )
 }
