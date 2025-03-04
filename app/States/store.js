@@ -1,31 +1,45 @@
 import { configureStore } from '@reduxjs/toolkit'
-import nameReducer from './Slice/nameSlice'
-import formOptionsReducer from './Slice/formOptionsSlice'
-import questionReducer from './Slice/questionsSlice'
-
-import { persistStore, persistReducer } from 'redux-persist'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { setupListeners } from '@reduxjs/toolkit/query'
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  persistReducer,
+  persistStore,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+} from 'redux-persist'
+import AsyncStorage from '@react-native-async-storage/async-storage' // Use AsyncStorage for React Native
+import { apiSlice } from './Api/ttsApi' // Ensure this import is correct
+import rootReducer from '././reducer'
 
 const persistConfig = {
-  key: 'questions',
-  storage: AsyncStorage,
-  whitelist: ['list'],
+  key: 'root',
+  storage: AsyncStorage, // Use AsyncStorage instead of default storage
+  blacklist: [
+    'api',
+    'tts',
+    // 'auth',
+    'theme',
+    'loading',
+  ],
 }
 
-const persistedQuestionReducer = persistReducer(persistConfig, questionReducer)
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
-const store = configureStore({
-  reducer: {
-    name: nameReducer,
-    formOptions: formOptionsReducer,
-    questions: persistedQuestionReducer,
-  },
+export const store = configureStore({
+  reducer: persistedReducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
-      serializableCheck: false,
-    }),
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }).concat(apiSlice.middleware), // Ensure the middleware is added here
+  devTools: process.env.NODE_ENV === 'development',
 })
 
-const persistor = persistStore(store)
+setupListeners(store.dispatch)
+export const persistor = persistStore(store)
 
-export { store, persistor }
+export default store

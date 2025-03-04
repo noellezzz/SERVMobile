@@ -9,6 +9,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import ModeSelector from '../../../Components/Interactables/ModeSelector'
 import { setLanguage, setOption } from '../../../States/Slice/formOptionsSlice'
 import Animated, { LinearTransition } from 'react-native-reanimated'
+import useEdgeTTSApi from '../../../Hooks/useEdgeTTSApi'
 
 const styles = StyleSheet.create({
   container: {
@@ -45,6 +46,7 @@ const Evaluation = ({ navigation }) => {
   const [selectedMode, setSelectedMode] = useState(options)
   const [selectedLanguage, setSelectedLanguage] = useState(language)
   const dispatch = useDispatch()
+  const { speak, isLoading, isError } = useEdgeTTSApi()
 
   const handleModeChange = mode => {
     setSelectedMode(mode)
@@ -85,12 +87,12 @@ const Evaluation = ({ navigation }) => {
     setForm(updatedForm)
   }
 
-  const playCurrentQuestion = num => {
-    if (language === 'English') {
-      playAudio(form[currentIndex + num].audioEnglish)
-    } else {
-      playAudio(form[currentIndex + num].audioTagalog)
-    }
+  const playCurrentQuestion = async num => {
+    const currentQuestion = form[currentIndex + num]
+    const text =
+      language === 'English' ? currentQuestion.english : currentQuestion.tagalog
+    const lang = language === 'English' ? 'en' : 'tl'
+    await speak.play(text, lang)
   }
 
   const handleGenerate = async () => {
@@ -236,6 +238,7 @@ const Evaluation = ({ navigation }) => {
             />
           </View>
         </View>
+        {isError && <Text>Error occurred while converting text to speech</Text>}
       </Animated.View>
     )
   )
