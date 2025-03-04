@@ -10,13 +10,13 @@ import {
   REGISTER,
   REHYDRATE,
 } from 'redux-persist'
-import AsyncStorage from '@react-native-async-storage/async-storage' // Use AsyncStorage for React Native
-import { apiSlice } from './Api/ttsApi' // Ensure this import is correct
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { apiSlice } from './Api/index'
 import rootReducer from '././reducer'
 
 const persistConfig = {
   key: 'root',
-  storage: AsyncStorage, // Use AsyncStorage instead of default storage
+  storage: AsyncStorage,
   blacklist: [
     'api',
     'tts',
@@ -35,7 +35,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(apiSlice.middleware), // Ensure the middleware is added here
+    }).concat(apiSlice.middleware),
   devTools: process.env.NODE_ENV === 'development',
 })
 

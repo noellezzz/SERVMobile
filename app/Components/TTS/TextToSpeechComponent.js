@@ -32,7 +32,7 @@ const TextToSpeechComponent = () => {
       <Button
         title="Repeat"
         onPress={handleRepeat}
-        disabled={!speak.isPlaying()}
+        disabled={isLoading || !text}
       />
       {isError && <Text>Error occurred while converting text to speech</Text>}
     </View>

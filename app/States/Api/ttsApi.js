@@ -1,22 +1,57 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { apiSlice } from './index';
+import { Platform } from 'react-native';
+import * as FileSystem from 'expo-file-system';
 
-const baseQuery = fetchBaseQuery({ baseUrl: 'http://127.0.0.1:5000/api/v1/tts/' })
-
-export const apiSlice = createApi({
-  reducerPath: 'api',
-  baseQuery,
-  tagTypes: ['TTS'],
-  endpoints: builder => ({
+const ttsApi = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
     getTextToSpeech: builder.mutation({
       query: ({ text, lang }) => ({
-        url: 'tts/',
+        url: `tts/`,
         method: 'GET',
         params: { text, lang },
-        responseHandler: response => response.blob(),
+        responseHandler: async (response) => {
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+          return response.blob();
+        },
       }),
-      transformResponse: response => URL.createObjectURL(response),
+      transformResponse: async (blob) => {
+        try {
+          const fileName = `tts-${Date.now()}.mp3`;
+          const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
+
+          const reader = new FileReader();
+
+          return new Promise((resolve, reject) => {
+            reader.onload = async () => {
+              try {
+                const base64data = reader.result.split(',')[1];
+
+                await FileSystem.writeAsStringAsync(fileUri, base64data, {
+                  encoding: FileSystem.EncodingType.Base64,
+                });
+
+                resolve(fileUri);
+              } catch (error) {
+                console.error('Error saving audio file:', error);
+                reject(error);
+              }
+            };
+
+            reader.onerror = () => {
+              reject(new Error('Failed to read blob data'));
+            };
+
+            reader.readAsDataURL(blob);
+          });
+        } catch (error) {
+          console.error('Error processing audio data:', error);
+          throw error;
+        }
+      },
     }),
   }),
-})
+});
 
-export const { useGetTextToSpeechMutation } = apiSlice
+export const { useGetTextToSpeechMutation } = ttsApi;

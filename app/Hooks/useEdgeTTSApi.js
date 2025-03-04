@@ -7,10 +7,14 @@ const useEdgeTTSApi = () => {
     useGetTextToSpeechMutation()
   const audioRef = useRef(new Audio.Sound())
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const [currentText, setCurrentText] = useState('')
+  const [currentLang, setCurrentLang] = useState('')
+  const [audioUrl, setAudioUrl] = useState(null)
 
   const convertTextToSpeech = async (text, lang) => {
     try {
       const response = await getTextToSpeech({ text, lang }).unwrap()
+      setAudioUrl(response)
       return response
     } catch (error) {
       console.error('Error converting text to speech:', error)
@@ -20,34 +24,57 @@ const useEdgeTTSApi = () => {
 
   const play = async (text, lang) => {
     try {
-      const audioUrl = await convertTextToSpeech(text, lang)
-      await audioRef.current.unloadAsync()
-      await audioRef.current.loadAsync({ uri: audioUrl })
-      await audioRef.current.playAsync()
-      setIsAudioPlaying(true)
+      // Save current text and language
+      setCurrentText(text)
+      setCurrentLang(lang)
 
-      audioRef.current.setOnPlaybackStatusUpdate(status => {
-        if (status.didJustFinish) {
-          setIsAudioPlaying(false)
-        }
-      })
+      // Only get new audio URL if text or language changed
+      let url = audioUrl
+      if (!url || text !== currentText || lang !== currentLang) {
+        url = await convertTextToSpeech(text, lang)
+      }
+
+      // Unload any existing audio
+      await audioRef.current.unloadAsync().catch(() => { })
+
+      // Load and play the audio
+      const status = await audioRef.current.loadAsync({ uri: url }, { shouldPlay: true })
+
+      if (status.isLoaded) {
+        setIsAudioPlaying(true)
+
+        audioRef.current.setOnPlaybackStatusUpdate(status => {
+          if (status.didJustFinish) {
+            setIsAudioPlaying(false)
+          }
+        })
+      } else {
+        throw new Error('Failed to load audio')
+      }
     } catch (error) {
       console.error('Error speaking text:', error)
+      setIsAudioPlaying(false)
     }
   }
 
   const stop = async () => {
     try {
-      await audioRef.current.stopAsync()
+      const status = await audioRef.current.getStatusAsync()
+      if (status.isLoaded) {
+        await audioRef.current.stopAsync()
+      }
       setIsAudioPlaying(false)
     } catch (error) {
       console.error('Error stopping audio:', error)
+      setIsAudioPlaying(false)
     }
   }
 
   const repeat = async () => {
     try {
-      await audioRef.current.replayAsync()
+      if (currentText) {
+        await play(currentText, currentLang)
+      }
     } catch (error) {
       console.error('Error repeating audio:', error)
     }
