@@ -36,14 +36,14 @@ const styles = StyleSheet.create({
 const Evaluation = ({ navigation }) => {
   const options = useSelector(state => state.formOptions.option)
   const language = useSelector(state => state.formOptions.language)
-  const questions = useSelector(state => state.questions.list)
+  // const questions = useSelector(state => state.questions.list)
 
   const {
     actions: {
       fetchDatas,
     },
     states: {
-      data,
+      data: questions,
       loading: testLoading
     }
   } = useResource('tests');
@@ -72,14 +72,32 @@ const Evaluation = ({ navigation }) => {
    */
 
   const loadQuestions = async () => {
+    if (!Array.isArray(questions) || questions.length === 0) {
+      return;
+    }
+    
+    // Map backend question format to our form structure
     const updatedForm = questions.map(q => ({
-      ...q,
+      id: q.id,
+      english: q.question_text_en,
+      tagalog: q.question_text_tl,
+      category: q.category,
+      options: q.options || [],
+      audioEnglish: '', // generate these as needed
+      audioTagalog: '', // generate these as needed
       answer: '',
+      created: q.created,
+      last_updated: q.last_updated,
     }))
     setForm(updatedForm)
+    playCurrentQuestion()
   }
-  
+
   const playCurrentQuestion = async (num = 0) => {
+    if (!form || form.length === 0 || !form[currentIndex + num]) {
+      return;
+    }
+    
     const currentQuestion = form[currentIndex + num]
     const text =
       language === 'English' ? currentQuestion?.english : currentQuestion?.tagalog
@@ -88,15 +106,13 @@ const Evaluation = ({ navigation }) => {
   }
 
   const handleModeChange = mode => {
-    setSelectedMode(mode)
+    setSelectedMode(prev => mode)
     dispatch(setOption(mode))
-    playCurrentQuestion()
   }
 
   const handleLanguageChange = language => {
-    setSelectedLanguage(language)
+    setSelectedLanguage(prev => language)
     dispatch(setLanguage(language))
-    playCurrentQuestion()
   }
 
   const handleGenerate = async () => {
@@ -164,12 +180,18 @@ const Evaluation = ({ navigation }) => {
   }, [])
 
   useEffect(() => {
-    console.log(data);
-  }, [data])
+    if (Array.isArray(questions) && questions.length > 0) {
+      loadQuestions();
+    }
+  }, [questions])
+
+  useEffect(() => {
+    playCurrentQuestion()
+  }, [language, selectedMode])
   
   useEffect(() => {
-    if (Array.isArray(questions)) {
-      questions.map(item => {
+    if (Array.isArray(form) && form.length > 0) {
+      form.forEach(item => {
         if (
           item.audioEnglish === '' ||
           item.audioEnglish === undefined ||
@@ -181,9 +203,8 @@ const Evaluation = ({ navigation }) => {
         }
       })
     }
-    loadQuestions()
     setLoading(false)
-  }, [])
+  }, [form])
 
   return (
     !loading && (
@@ -209,9 +230,11 @@ const Evaluation = ({ navigation }) => {
               Question {currentIndex + 1} of {form.length}
             </Text>
             <Text style={{ textAlign: 'center', fontSize: 20 }}>
-              {language === 'English'
-                ? form[currentIndex]?.english
-                : form[currentIndex]?.tagalog}
+              {form.length > 0 && (
+                language === 'English'
+                  ? form[currentIndex]?.english
+                  : form[currentIndex]?.tagalog
+              )}
             </Text>
             {options == 'Type to Answer' && (
               <View style={{ borderWidth: 1, marginVertical: 10, height: 100 }}>
