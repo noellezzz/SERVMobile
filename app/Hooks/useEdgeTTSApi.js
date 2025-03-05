@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { useGetTextToSpeechMutation } from '../States/Api/ttsApi'
+import { useGetTextToSpeechMutation } from '@/States/Api/ttsApi'
 import { Audio } from 'expo-av'
 
 const useEdgeTTSApi = () => {

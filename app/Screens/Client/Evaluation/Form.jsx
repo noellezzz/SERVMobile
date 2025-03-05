@@ -2,14 +2,15 @@ import { View, StyleSheet, Button, Text, TextInput, Image } from 'react-native'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Audio } from 'expo-av'
-import generateAudios from '../../../Utils/generateAudios'
-import CustomButton from '../../../Components/Buttons/CustomButton'
-import wordmark from '../../../../assets/SERV-adm.png'
+import generateAudios from '@/Utils/generateAudios'
+import CustomButton from '@/Components/Buttons/CustomButton'
+import wordmark from '@/../assets/SERV-adm.png'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import ModeSelector from '../../../Components/Interactables/ModeSelector'
-import { setLanguage, setOption } from '../../../States/Slice/formOptionsSlice'
+import ModeSelector from '@/Components/Interactables/ModeSelector'
+import { setLanguage, setOption } from '@/States/Slice/formOptionsSlice'
 import Animated, { LinearTransition } from 'react-native-reanimated'
-import useEdgeTTSApi from '../../../Hooks/useEdgeTTSApi'
+import useEdgeTTSApi from '@/Hooks/useEdgeTTSApi'
+import useResource from '@/Hooks/useResource'
 
 const styles = StyleSheet.create({
   container: {
@@ -33,51 +34,42 @@ const styles = StyleSheet.create({
 })
 
 const Evaluation = ({ navigation }) => {
-  const [modalVisible, setModalVisible] = useState(false)
-  const [loadingMessage, setLoadingMessage] = useState('')
-  const [isUnresolved, setIsUnresolved] = useState(false)
   const options = useSelector(state => state.formOptions.option)
   const language = useSelector(state => state.formOptions.language)
   const questions = useSelector(state => state.questions.list)
-  const [loading, setLoading] = useState(true)
-  const [start, setStart] = useState(true)
-  const [form, setForm] = useState([])
+
+  const {
+    actions: {
+      fetchDatas,
+    },
+    states: {
+      data,
+      loading: testLoading
+    }
+  } = useResource('tests');
+
+
+  
   const { generateAudioFiles } = generateAudios()
-  const [selectedMode, setSelectedMode] = useState(options)
-  const [selectedLanguage, setSelectedLanguage] = useState(language)
   const dispatch = useDispatch()
   const { speak, isLoading, isError } = useEdgeTTSApi()
 
-  const handleModeChange = mode => {
-    setSelectedMode(mode)
-    dispatch(setOption(mode))
-  }
-
-  const handleLanguageChange = language => {
-    setSelectedLanguage(language)
-    dispatch(setLanguage(language))
-  }
-
-  useEffect(() => {
-    if (Array.isArray(questions)) {
-      questions.map(item => {
-        if (
-          item.audioEnglish === '' ||
-          item.audioEnglish === undefined ||
-          item.audioTagalog === '' ||
-          item.audioTagalog === undefined
-        ) {
-          setModalVisible(true)
-          setIsUnresolved(true)
-        }
-      })
-    }
-    loadQuestions()
-    setLoading(false)
-  }, [])
-
+  const [modalVisible, setModalVisible] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState('')
+  const [isUnresolved, setIsUnresolved] = useState(false)
+  const [start, setStart] = useState(true)
+  const [loading, setLoading] = useState(testLoading)
+  const [form, setForm] = useState([])
+  const [selectedMode, setSelectedMode] = useState(options)
+  const [selectedLanguage, setSelectedLanguage] = useState(language)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answer, setAnswer] = useState('')
+
+
+  
+  /**
+   *  HANDLERS 
+   */
 
   const loadQuestions = async () => {
     const updatedForm = questions.map(q => ({
@@ -86,13 +78,25 @@ const Evaluation = ({ navigation }) => {
     }))
     setForm(updatedForm)
   }
-
-  const playCurrentQuestion = async num => {
+  
+  const playCurrentQuestion = async (num = 0) => {
     const currentQuestion = form[currentIndex + num]
     const text =
-      language === 'English' ? currentQuestion.english : currentQuestion.tagalog
+      language === 'English' ? currentQuestion?.english : currentQuestion?.tagalog
     const lang = language === 'English' ? 'en' : 'tl'
     await speak.play(text, lang)
+  }
+
+  const handleModeChange = mode => {
+    setSelectedMode(mode)
+    dispatch(setOption(mode))
+    playCurrentQuestion()
+  }
+
+  const handleLanguageChange = language => {
+    setSelectedLanguage(language)
+    dispatch(setLanguage(language))
+    playCurrentQuestion()
   }
 
   const handleGenerate = async () => {
@@ -151,6 +155,36 @@ const Evaluation = ({ navigation }) => {
     }
   }
 
+  /**
+   *  EFFECTS
+   */
+
+  useEffect(()=>{
+    fetchDatas();
+  }, [])
+
+  useEffect(() => {
+    console.log(data);
+  }, [data])
+  
+  useEffect(() => {
+    if (Array.isArray(questions)) {
+      questions.map(item => {
+        if (
+          item.audioEnglish === '' ||
+          item.audioEnglish === undefined ||
+          item.audioTagalog === '' ||
+          item.audioTagalog === undefined
+        ) {
+          setModalVisible(true)
+          setIsUnresolved(true)
+        }
+      })
+    }
+    loadQuestions()
+    setLoading(false)
+  }, [])
+
   return (
     !loading && (
       <Animated.View layout={LinearTransition} style={styles.container}>
@@ -176,8 +210,8 @@ const Evaluation = ({ navigation }) => {
             </Text>
             <Text style={{ textAlign: 'center', fontSize: 20 }}>
               {language === 'English'
-                ? form[currentIndex].english
-                : form[currentIndex].tagalog}
+                ? form[currentIndex]?.english
+                : form[currentIndex]?.tagalog}
             </Text>
             {options == 'Type to Answer' && (
               <View style={{ borderWidth: 1, marginVertical: 10, height: 100 }}>

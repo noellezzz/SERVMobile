@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "./app/*"
+            ]
+        }
+    },
+    "extends": "expo/tsconfig.base",
+    "exclude": [
+        "node_modules",
+        "babel.config.js",
+        "metro.config.js"
+    ]
+}

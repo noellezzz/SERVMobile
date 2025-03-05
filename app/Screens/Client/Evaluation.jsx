@@ -1,10 +1,10 @@
 import { View, Text, Image } from 'react-native'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { setLanguage, setOption } from '../../States/Slice/formOptionsSlice'
-import wordmark from '../../../assets/SERV-adm.png'
-import ModeSelector from '../../Components/Interactables/ModeSelector'
-import CustomButton from '../../Components/Buttons/CustomButton'
+import { setLanguage, setOption } from '@/States/Slice/formOptionsSlice'
+import wordmark from '@/../assets/SERV-adm.png'
+import ModeSelector from '@/Components/Interactables/ModeSelector'
+import CustomButton from '@/Components/Buttons/CustomButton'
 
 const Evaluation = ({ navigation }) => {
   const [selectedMode, setSelectedMode] = useState('Auto')
