@@ -19,17 +19,19 @@ const Welcome = ({ navigation }) => {
   const data = [
     { component: CustomSlide1, props: {} },
     { component: CustomSlide2, props: {} },
-    { component: CustomSlide3, props: { navigation } },
+    { component: CustomSlide3, props: { 
+      navigation 
+    } },
   ]
 
   const handleSnapToItem = index => {
     setActiveIndex(index)
 
-    if (index === data.length - 1) {
-      setTimeout(() => {
-        navigation.replace('ClientStack')
-      }, 500)
-    }
+    // if (index === data.length - 1) {
+    //   setTimeout(() => {
+    //     navigation.replace('ClientStack')
+    //   }, 500)
+    // }
   }
 
   return (
