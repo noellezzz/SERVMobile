@@ -132,14 +132,14 @@ const Evaluation = ({ navigation }) => {
   }
 
   const handleNext = () => {
-    setAnswer(form[currentIndex + 1].answer)
+    setAnswer(form[currentIndex + 1]?.answer || '')
     handleUpdateForm()
     setCurrentIndex(prev => prev + 1)
     playCurrentQuestion(1)
   }
 
   const handlePrev = () => {
-    setAnswer(form[currentIndex - 1].answer)
+    setAnswer(form[currentIndex - 1]?.answer || '')
     handleUpdateForm()
     setCurrentIndex(prev => prev - 1)
     playCurrentQuestion(-1)
