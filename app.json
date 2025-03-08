@@ -18,7 +18,8 @@
         "NSSpeechRecognitionUsageDescription": "Allow $(PRODUCT_NAME) to use speech recognition.",
         "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to use the microphone.",
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to use the camera."
-      }
+      },
+      "bundleIdentifier": "com.anonymous.boilerplatern"
     },
     "android": {
       "adaptiveIcon": {
@@ -35,6 +36,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "@wdragon/react-native-voice",
       [
         "expo-speech-recognition",
         {
