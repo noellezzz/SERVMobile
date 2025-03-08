@@ -36,23 +36,24 @@ const styles = StyleSheet.create({
 const Evaluation = ({ navigation }) => {
   const options = useSelector(state => state.formOptions.option)
   const language = useSelector(state => state.formOptions.language)
-  // const questions = useSelector(state => state.questions.list)
+  const _questions = useSelector(state => state.questions.list)
+  const [questions, setQuestions] = useState(_questions)
 
+
+  
+  const dispatch = useDispatch()
+  const { generateAudioFiles } = generateAudios()
+  const { speak, isLoading, isError } = useEdgeTTSApi()
   const {
     actions: {
       fetchDatas,
     },
     states: {
-      data: questions,
+      data,
       loading: testLoading
     }
   } = useResource('tests');
 
-
-  
-  const { generateAudioFiles } = generateAudios()
-  const dispatch = useDispatch()
-  const { speak, isLoading, isError } = useEdgeTTSApi()
 
   const [modalVisible, setModalVisible] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
@@ -71,20 +72,15 @@ const Evaluation = ({ navigation }) => {
    *  HANDLERS 
    */
 
-  const loadQuestions = async () => {
-    if (!Array.isArray(questions) || questions.length === 0) {
-      return;
-    }
-    
-    // Map backend question format to our form structure
-    const updatedForm = questions.map(q => ({
+  const loadQuestions = async (data) => {
+    const updatedForm = data.map(q => ({
       id: q.id,
       english: q.question_text_en,
       tagalog: q.question_text_tl,
       category: q.category,
       options: q.options || [],
-      audioEnglish: '', // generate these as needed
-      audioTagalog: '', // generate these as needed
+      audioEnglish: '',
+      audioTagalog: '',
       answer: '',
       created: q.created,
       last_updated: q.last_updated,
@@ -180,10 +176,10 @@ const Evaluation = ({ navigation }) => {
   }, [])
 
   useEffect(() => {
-    if (Array.isArray(questions) && questions.length > 0) {
-      loadQuestions();
+    if (Array.isArray(data) && data.length > 0) {
+      loadQuestions(data);
     }
-  }, [questions])
+  }, [data])
 
   useEffect(() => {
     playCurrentQuestion()

@@ -8,8 +8,8 @@
 // ex: useLoginMutation, useLoginQuery, useLoginSubscription
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-// IP Address of the backend server
-const API_URL = process.env.REACT_APP_API_URL || 'http://192.168.108.139:5000';
+// IP Address of the backend server 
+const API_URL = process.env.REACT_APP_API_URL || 'http://192.168.15.139:5000';
 const baseQuery = fetchBaseQuery({ baseUrl: API_URL + '/api/v1/' });
 
 export const apiSlice = createApi({
