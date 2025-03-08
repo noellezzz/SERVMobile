@@ -10,6 +10,7 @@ import './app/styles/global.css'
 import { store, persistor } from './app/States/store'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
+import Evaluation from '@/Screens/Client/Evaluation'
 
 const Stack = createStackNavigator()
 
@@ -26,6 +27,8 @@ export default function App() {
             <Stack.Screen name="AdminDrawer" component={AdminDrawer} />
             <Stack.Screen name="Welcome" component={Welcome} />
             <Stack.Screen name="Form" component={Form} />
+            <Stack.Screen name="Evaluation" component={Evaluation} />
+
           </Stack.Navigator>
         </NavigationContainer>
       </PersistGate>

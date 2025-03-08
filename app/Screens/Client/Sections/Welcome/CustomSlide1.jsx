@@ -1,8 +1,8 @@
 import React from 'react'
 import { View, Text, Image, Button } from 'react-native'
-import HeroSection from '../../../Client/Sections/HeroSection'
-import WordMark from '../../../../../assets/SERV-adm.png'
-import Logo from '../../../../../assets/SERV_Logo.png'
+import HeroSection from '../HeroSection'
+import WordMark from '@/../assets/SERV-adm.png'
+import Logo from '@/../assets/SERV_Logo.png'
 
 const CustomSlide1 = () => {
   return (

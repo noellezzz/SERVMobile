@@ -37,7 +37,6 @@ const Evaluation = ({ navigation }) => {
   const options = useSelector(state => state.formOptions.option)
   const language = useSelector(state => state.formOptions.language)
   const _questions = useSelector(state => state.questions.list)
-  const [questions, setQuestions] = useState(_questions)
 
 
   
@@ -65,6 +64,7 @@ const Evaluation = ({ navigation }) => {
   const [selectedLanguage, setSelectedLanguage] = useState(language)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answer, setAnswer] = useState('')
+  const [speechError, setSpeechError] = useState(null)
 
 
   
@@ -74,16 +74,17 @@ const Evaluation = ({ navigation }) => {
 
   const loadQuestions = async (data) => {
     const updatedForm = data.map(q => ({
-      id: q.id,
-      english: q.question_text_en,
-      tagalog: q.question_text_tl,
-      category: q.category,
-      options: q.options || [],
+      id: q?.id,
+      english: q?.question_text_en,
+      tagalog: q?.question_text_tl,
+      category: q?.category,
+      options: q?.options || [],
       audioEnglish: '',
       audioTagalog: '',
       answer: '',
-      created: q.created,
-      last_updated: q.last_updated,
+      created: q?.created,
+      last_updated: q?.last_updated,
+      ...data,
     }))
     setForm(updatedForm)
     playCurrentQuestion()
@@ -94,11 +95,37 @@ const Evaluation = ({ navigation }) => {
       return;
     }
     
-    const currentQuestion = form[currentIndex + num]
-    const text =
-      language === 'English' ? currentQuestion?.english : currentQuestion?.tagalog
-    const lang = language === 'English' ? 'en' : 'tl'
-    await speak.play(text, lang)
+    try {
+      setSpeechError(null);
+      const currentQuestion = form[currentIndex + num]
+      const text =
+        language === 'English' ? currentQuestion?.english : currentQuestion?.tagalog
+      
+      // Validate text before trying to speak it
+      if (!text || typeof text !== 'string') {
+        console.warn('Invalid text for speech synthesis:', text);
+        return;
+      }
+      
+      const lang = language === 'English' ? 'en' : 'tl'
+      await speak.play(text, lang)
+    } catch (error) {
+      console.error('Error speaking text:', error);
+      setSpeechError(`Failed to speak text. ${error.message}`);
+      
+      // Fallback to using the built-in Audio player if available
+      if (form[currentIndex + num]) {
+        const audioPath = language === 'English' 
+          ? form[currentIndex + num].audioEnglish 
+          : form[currentIndex + num].audioTagalog;
+          
+        if (audioPath) {
+          playAudio(audioPath).catch(err => 
+            console.error('Fallback audio playback failed:', err)
+          );
+        }
+      }
+    }
   }
 
   const handleModeChange = mode => {
@@ -170,7 +197,6 @@ const Evaluation = ({ navigation }) => {
   /**
    *  EFFECTS
    */
-
   useEffect(()=>{
     fetchDatas();
   }, [])
@@ -178,6 +204,8 @@ const Evaluation = ({ navigation }) => {
   useEffect(() => {
     if (Array.isArray(data) && data.length > 0) {
       loadQuestions(data);
+    } else {
+      loadQuestions(_questions);
     }
   }, [data])
 
@@ -271,6 +299,17 @@ const Evaluation = ({ navigation }) => {
                 </View>
               </View>
             </View>
+            {speechError && (
+              <View style={{ marginTop: 10, padding: 8, backgroundColor: '#ffdddd', borderRadius: 5 }}>
+                <Text style={{ color: 'red' }}>{speechError}</Text>
+                <CustomButton 
+                  mode="outlined"
+                  title="Retry Speech"
+                  onPress={() => playCurrentQuestion(0)}
+                  style={{ marginTop: 5 }}
+                />
+              </View>
+            )}
           </View>
           <View
             style={{

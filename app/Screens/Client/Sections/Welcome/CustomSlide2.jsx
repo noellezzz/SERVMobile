@@ -1,10 +1,10 @@
 import React from 'react'
 import { View, Text, Image, Button } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
-import HeroSection from '../../../Client/Sections/HeroSection'
-import ContainerTile from '../../../../Components/Card/ContainerTile'
-import WordMark from '../../../../../assets/SERV-adm.png'
-import Logo from '../../../../../assets/SERV_Logo.png'
+import HeroSection from '../HeroSection'
+import ContainerTile from '@/Components/Card/ContainerTile'
+import WordMark from '@/../assets/SERV-adm.png'
+import Logo from '@/../assets/SERV_Logo.png'
 
 const CustomSlide2 = ({ navigation }) => {
   return (
