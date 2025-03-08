@@ -29,6 +29,9 @@ const Evaluation = ({ navigation }) => {
     dispatch(initializeState());
   }, [dispatch]);
 
+  // STATES
+  // ##################################################
+
   const {
     userId: _userId,
     employeeIds,
@@ -61,6 +64,11 @@ const Evaluation = ({ navigation }) => {
   // Dropdown state
   const [employeeDropdownVisible, setEmployeeDropdownVisible] = useState(false)
   const [serviceDropdownVisible, setServiceDropdownVisible] = useState(false)
+  // ##################################################
+
+
+  // HANDLERS
+  // ##################################################
 
   // Handle mode and language changes
   const handleModeChange = mode => {
@@ -348,8 +356,17 @@ const Evaluation = ({ navigation }) => {
       serviceIds: selectedServiceIds
     })
   }
+  // ##################################################
 
-  // Initial data fetch
+
+  // EFFECTS AND RENDERING
+  // ##################################################
+  useEffect(() => {
+    // stop any audio playback when the component mounts
+    
+
+  }, [])
+
   useEffect(() => {
     fetchServices()
     fetchEmployeeInfo()
@@ -366,7 +383,8 @@ const Evaluation = ({ navigation }) => {
 
   }, [employeeIds, serviceIds]);
 
-  // QR Scanner view
+
+  // ##################################################
   if (showScanner) {
     return (
       <View style={styles.scannerContainer}>
@@ -381,7 +399,6 @@ const Evaluation = ({ navigation }) => {
     )
   }
 
-  // Main view
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.logoContainer}>

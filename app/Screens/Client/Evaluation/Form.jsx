@@ -2,13 +2,15 @@ import { View, StyleSheet, Button, Text, TextInput, Image } from 'react-native'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Audio } from 'expo-av'
+
 import generateAudios from '@/Utils/generateAudios'
 import CustomButton from '@/Components/Buttons/CustomButton'
 import wordmark from '@/../assets/SERV-adm.png'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import ModeSelector from '@/Components/Interactables/ModeSelector'
-import { setLanguage, setOption } from '@/States/Slice/formOptionsSlice'
 import Animated, { LinearTransition } from 'react-native-reanimated'
+
+import { setLanguage, setOption } from '@/States/Slice/formOptionsSlice'
 import useEdgeTTSApi from '@/Hooks/useEdgeTTSApi'
 import useResource from '@/Hooks/useResource'
 
@@ -34,12 +36,17 @@ const styles = StyleSheet.create({
 })
 
 const Evaluation = ({ navigation }) => {
-  const options = useSelector(state => state.formOptions.option)
-  const language = useSelector(state => state.formOptions.language)
   const _questions = useSelector(state => state.questions.list)
+  const {
+    language,
+    options,
+    userId,
+    employeeIds,
+    serviceIds,
+  } = useSelector(state => state.formOptions)
 
 
-  
+
   const dispatch = useDispatch()
   const { generateAudioFiles } = generateAudios()
   const { speak, isLoading, isError } = useEdgeTTSApi()
@@ -52,6 +59,11 @@ const Evaluation = ({ navigation }) => {
       loading: testLoading
     }
   } = useResource('tests');
+  const {
+    actions: {
+      doStore
+    },
+  } = useResource('results');
 
 
   const [modalVisible, setModalVisible] = useState(false)
@@ -67,7 +79,7 @@ const Evaluation = ({ navigation }) => {
   const [speechError, setSpeechError] = useState(null)
 
 
-  
+
   /**
    *  HANDLERS 
    */
@@ -94,33 +106,32 @@ const Evaluation = ({ navigation }) => {
     if (!form || form.length === 0 || !form[currentIndex + num]) {
       return;
     }
-    
+
     try {
       setSpeechError(null);
       const currentQuestion = form[currentIndex + num]
       const text =
         language === 'English' ? currentQuestion?.english : currentQuestion?.tagalog
-      
-      // Validate text before trying to speak it
+
       if (!text || typeof text !== 'string') {
         console.warn('Invalid text for speech synthesis:', text);
         return;
       }
-      
+
       const lang = language === 'English' ? 'en' : 'tl'
       await speak.play(text, lang)
     } catch (error) {
       console.error('Error speaking text:', error);
       setSpeechError(`Failed to speak text. ${error.message}`);
-      
+
       // Fallback to using the built-in Audio player if available
       if (form[currentIndex + num]) {
-        const audioPath = language === 'English' 
-          ? form[currentIndex + num].audioEnglish 
+        const audioPath = language === 'English'
+          ? form[currentIndex + num].audioEnglish
           : form[currentIndex + num].audioTagalog;
-          
+
         if (audioPath) {
-          playAudio(audioPath).catch(err => 
+          playAudio(audioPath).catch(err =>
             console.error('Fallback audio playback failed:', err)
           );
         }
@@ -194,10 +205,42 @@ const Evaluation = ({ navigation }) => {
     }
   }
 
+
+  const handleDone = () => {
+    const payload = {
+      user_info: {
+        userId,
+        employeeIds, 
+        serviceIds
+      },
+      evaluation: form,
+      multiple: true,
+      is_new_feedback: true,
+    }
+    doStore(payload).then(() => {
+      navigation.goBack();
+    });
+  };
+
+
+  const handleGoBack = () => {
+    speak.stop()
+    navigation.goBack()
+  }
+
   /**
    *  EFFECTS
    */
-  useEffect(()=>{
+  // if the component unmounts, stop the any audio
+  useEffect(() => {
+    return () => {
+      Audio.setAudioModeAsync({ staysActiveInBackground: false })
+    }
+  }, [])
+
+
+
+  useEffect(() => {
     fetchDatas();
   }, [])
 
@@ -212,7 +255,7 @@ const Evaluation = ({ navigation }) => {
   useEffect(() => {
     playCurrentQuestion()
   }, [language, selectedMode])
-  
+
   useEffect(() => {
     if (Array.isArray(form) && form.length > 0) {
       form.forEach(item => {
@@ -234,7 +277,7 @@ const Evaluation = ({ navigation }) => {
     !loading && (
       <Animated.View layout={LinearTransition} style={styles.container}>
         <View style={{ position: 'absolute', top: 40, left: 10, width: 100 }}>
-          <CustomButton title="Back" onPress={() => navigation.goBack()} />
+          <CustomButton title="Back" onPress={handleGoBack} />
         </View>
         <Image
           source={wordmark}
@@ -292,9 +335,10 @@ const Evaluation = ({ navigation }) => {
                 <View style={{ flex: 1 }}>
                   <CustomButton
                     mode="outlined"
-                    title="Next"
-                    disabled={form.length === currentIndex + 1}
-                    onPress={handleNext}
+                    title={currentIndex === form.length - 1 ? 'Finish' : 'Next'}
+                    onPress={
+                      currentIndex === form.length - 1 ? handleDone : handleNext
+                    }
                   />
                 </View>
               </View>
@@ -302,7 +346,7 @@ const Evaluation = ({ navigation }) => {
             {speechError && (
               <View style={{ marginTop: 10, padding: 8, backgroundColor: '#ffdddd', borderRadius: 5 }}>
                 <Text style={{ color: 'red' }}>{speechError}</Text>
-                <CustomButton 
+                <CustomButton
                   mode="outlined"
                   title="Retry Speech"
                   onPress={() => playCurrentQuestion(0)}
