@@ -4,6 +4,9 @@
 node_modules/
 android
 ios
+build
+.vercel
+
 # Expo
 .expo/
 dist/
