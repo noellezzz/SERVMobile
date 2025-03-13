@@ -17,8 +17,8 @@ const useEdgeTTSApi = () => {
       setAudioUrl(response)
       return response
     } catch (error) {
-      console.error('Error converting text to speech:', error)
-      throw error
+      // console.error('Error converting text to speech:', error)
+      // throw error
     }
   }
 
@@ -52,7 +52,7 @@ const useEdgeTTSApi = () => {
         throw new Error('Failed to load audio')
       }
     } catch (error) {
-      console.error('Error speaking text:', error)
+      // console.error('Error speaking text:', error)
       setIsAudioPlaying(false)
     }
   }
@@ -76,7 +76,7 @@ const useEdgeTTSApi = () => {
         await play(currentText, currentLang)
       }
     } catch (error) {
-      console.error('Error repeating audio:', error)
+      // console.error('Error repeating audio:', error)
     }
   }
 

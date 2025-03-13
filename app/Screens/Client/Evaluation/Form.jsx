@@ -148,7 +148,7 @@ const Evaluation = ({ navigation }) => {
         requestVoicePermission();
       }
     } catch (error) {
-      console.error('Error checking voice recognition availability:', error);
+      // console.error('Error checking voice recognition availability:', error);
     }
   };
 
@@ -368,8 +368,11 @@ const Evaluation = ({ navigation }) => {
       is_new_feedback: true,
     }
     doStore(payload).then(() => {
+    }).catch(e => {
+        console.warn(e.error)
+      });
+
       navigation.goBack();
-    });
   };
   const handleGoBack = () => {
     speak.stop()
@@ -393,7 +396,7 @@ const Evaluation = ({ navigation }) => {
   }, [])
   useEffect(() => {
     if (Array.isArray(data) && data.length > 0) {
-      loadQuestions(data);
+      loadQuestions(data.filter(i => i.is_active));
     } else {
       loadQuestions(_questions);
     }
