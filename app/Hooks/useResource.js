@@ -44,7 +44,7 @@ export default function useResource(resourceName, isPublic = false) {
     // Fetch functions
     const fetchDatas = useCallback(async ({
         qStr = '',
-        doRefresh = false
+        doRefresh = false,
     } = {}) => {
         if (resources?.list[resourceName]) {
             setData(resources?.list[resourceName]);
